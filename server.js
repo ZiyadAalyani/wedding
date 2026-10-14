@@ -1,10 +1,10 @@
 const http=require('http'),fs=require('fs'),path=require('path'),crypto=require('crypto');
 const PORT=process.env.PORT||3000, ADMIN=process.env.ADMIN_KEY||'change-me';
-const DB=path.join(__dirname,'data.json'), PUB=path.join(__dirname,'public');
+const DB=path.join(__dirname,'data.json'), PUB=__dirname;
 const load=()=>{try{return JSON.parse(fs.readFileSync(DB))}catch{return{rsvps:[],wishes:[]}}};
 const save=d=>fs.writeFileSync(DB,JSON.stringify(d,null,2));
 const clean=(s,n=300)=>String(s||'').replace(/[<>]/g,'').trim().slice(0,n);
-const mime={'.html':'text/html','.css':'text/css','.js':'text/javascript','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.mp3':'audio/mpeg','.ico':'image/x-icon'};
+const mime={'.html':'text/html','.css':'text/css','.js':'text/javascript','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.mp3':'audio/mpeg','.ico':'image/x-icon'};
 const send=(r,c,o)=>{r.writeHead(c,{'Content-Type':'application/json','Cache-Control':'no-store'});r.end(JSON.stringify(o))};
 const body=q=>new Promise(resolve=>{let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',()=>{try{resolve(JSON.parse(b))}catch{resolve({})}})});
 const validKey=k=>{const a=Buffer.from(String(k||'')),b=Buffer.from(String(ADMIN||''));return b.length>0&&a.length===b.length&&crypto.timingSafeEqual(a,b)};
